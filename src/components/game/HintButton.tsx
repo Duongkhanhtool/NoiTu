@@ -21,7 +21,12 @@ export function HintButton({ requiredSyllable, usedWords, visible }: HintButtonP
 
     const normalizedSyllable = normalizeVietnamese(requiredSyllable)
     const available = DICTIONARY_INDEX.get(normalizedSyllable) ?? []
-    const unused = available.filter((w) => !usedWords.has(normalizeVietnamese(w)))
+    // Only show 2-syllable words (valid compound words for the game)
+    const unused = available.filter((w) => {
+      if (usedWords.has(normalizeVietnamese(w))) return false
+      const syllables = w.trim().split(/\s+/)
+      return syllables.length === 2
+    })
 
     const shuffled = [...unused].sort(() => Math.random() - 0.5)
     setHints(shuffled.slice(0, 3))

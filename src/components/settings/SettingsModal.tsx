@@ -1,5 +1,6 @@
 import { useSettings } from '../../App'
 import { GEMINI_CONFIG } from '../../lib/gemini-config'
+import { ALL_WORDS } from '../../data/dictionary-index'
 import type { Difficulty } from '../../types/game'
 
 interface SettingsModalProps {
@@ -76,7 +77,7 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
                 {!settings.geminiEnabled && (
                   <p className="text-xs text-gray-400 dark:text-gray-500">
-                    Bot sẽ dùng từ điển có sẵn (~1200 từ)
+                    Bot sẽ dùng từ điển có sẵn (~{ALL_WORDS.length.toLocaleString()} từ)
                   </p>
                 )}
               </>
