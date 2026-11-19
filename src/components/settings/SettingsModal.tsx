@@ -14,10 +14,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   if (!isOpen) return null
 
   const difficulties: { key: Difficulty; label: string; desc: string; time: number }[] = [
-    { key: 'easy', label: '😊 Dễ', desc: '30 giây mỗi lượt, nhiều gợi ý', time: 30 },
-    { key: 'medium', label: '🤔 Vừa', desc: '20 giây mỗi lượt', time: 20 },
-    { key: 'hard', label: '😈 Khó', desc: '15 giây mỗi lượt, ít gợi ý', time: 15 },
+    { key: 'easy', label: '🐰 Dễ', desc: '30 giây mỗi lượt', time: 30 },
+    { key: 'medium', label: '🦊 Vừa', desc: '20 giây mỗi lượt', time: 20 },
+    { key: 'hard', label: '🐉 Khó', desc: '15 giây mỗi lượt', time: 15 },
   ]
+
+  const timeOptions = [15, 20, 30, 60, 120, 180]
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
@@ -52,7 +54,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
             {GEMINI_CONFIG.isConfigured ? (
               <>
-                {/* Toggle */}
                 <label className="flex items-center justify-between cursor-pointer mb-3">
                   <span className="font-medium">Dùng Gemini AI</span>
                   <ToggleSwitch
@@ -60,20 +61,6 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                     onChange={(v) => updateSettings({ geminiEnabled: v })}
                   />
                 </label>
-
-                {settings.geminiEnabled && (
-                  <div className="space-y-1 pl-1 animate-slide-up">
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
-                      Model: <span className="font-mono">{GEMINI_CONFIG.model}</span>
-                    </p>
-                    <p className="text-xs text-gray-400 dark:text-gray-500">
-                      API: <span className="font-mono">{GEMINI_CONFIG.baseUrl}</span>
-                    </p>
-                    <p className="text-xs text-game-mint mt-1">
-                      ✅ API key đã cấu hình trong .env
-                    </p>
-                  </div>
-                )}
 
                 {!settings.geminiEnabled && (
                   <p className="text-xs text-gray-400 dark:text-gray-500">
@@ -136,6 +123,28 @@ VITE_GEMINI_MODEL=gemini-3.8-flash-high`}
             </div>
           </section>
 
+          {/* ── Time per turn ── */}
+          <section>
+            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+              ⏱️ Thời gian mỗi lượt
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {timeOptions.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => updateSettings({ turnTimeLimit: t })}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                    settings.turnTimeLimit === t
+                      ? 'bg-game-ocean text-white shadow-md scale-105'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {t < 60 ? `${t}s` : `${t / 60} phút`}
+                </button>
+              ))}
+            </div>
+          </section>
+
           {/* ── Voice ── */}
           <section>
             <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
@@ -149,48 +158,12 @@ VITE_GEMINI_MODEL=gemini-3.8-flash-high`}
               />
             </label>
             {settings.ttsEnabled && (
-              <div className="animate-slide-up space-y-4">
-                {/* TTS Source selector */}
-                <div>
-                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-2">
-                    Nguồn giọng đọc
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => updateSettings({ ttsSource: 'google' })}
-                      className={`p-3 rounded-xl text-left transition-all ${
-                        (settings.ttsSource ?? 'google') === 'google'
-                          ? 'bg-game-ocean/10 dark:bg-game-ocean/20 ring-2 ring-game-ocean/40'
-                          : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      }`}
-                    >
-                      <div className="text-sm font-bold">🌐 Google</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        Tự nhiên, chuẩn tiếng Việt
-                      </div>
-                    </button>
-                    <button
-                      onClick={() => updateSettings({ ttsSource: 'browser' })}
-                      className={`p-3 rounded-xl text-left transition-all ${
-                        settings.ttsSource === 'browser'
-                          ? 'bg-game-ocean/10 dark:bg-game-ocean/20 ring-2 ring-game-ocean/40'
-                          : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      }`}
-                    >
-                      <div className="text-sm font-bold">💻 Trình duyệt</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        Dùng voice hệ thống
-                      </div>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Test voice button */}
+              <div className="animate-slide-up">
                 <button
                   onClick={() => {
                     import('../../lib/tts').then(({ getTTSService }) => {
                       const tts = getTTSService()
-                      tts.setSource(settings.ttsSource ?? 'google')
+                      tts.setSource('google')
                       tts.setRate(settings.ttsRate)
                       tts.speak('xin chào, bạn đang chơi nối từ')
                     })
@@ -199,28 +172,6 @@ VITE_GEMINI_MODEL=gemini-3.8-flash-high`}
                 >
                   🔊 Nghe thử giọng đọc
                 </button>
-
-                {/* Speed slider — only relevant for browser mode */}
-                {settings.ttsSource === 'browser' && (
-                  <div>
-                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-2">
-                      Tốc độ đọc: {settings.ttsRate.toFixed(1)}x
-                    </label>
-                    <input
-                      type="range"
-                      min="0.5"
-                      max="1.5"
-                      step="0.1"
-                      value={settings.ttsRate}
-                      onChange={(e) => updateSettings({ ttsRate: parseFloat(e.target.value) })}
-                      className="w-full accent-game-ocean"
-                    />
-                    <div className="flex justify-between text-xs text-gray-400 mt-1">
-                      <span>Chậm</span>
-                      <span>Nhanh</span>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </section>
