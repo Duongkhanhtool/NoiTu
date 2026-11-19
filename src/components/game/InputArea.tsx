@@ -8,6 +8,7 @@ interface InputAreaProps {
   sttSupported: boolean
   onMicToggle: () => void
   isListening: boolean
+  isMicWarming?: boolean
   interimTranscript: string
 }
 
@@ -19,6 +20,7 @@ export function InputArea({
   sttSupported,
   onMicToggle,
   isListening,
+  isMicWarming = false,
   interimTranscript,
 }: InputAreaProps) {
   const [text, setText] = useState('')
@@ -95,7 +97,7 @@ export function InputArea({
   )
 
   return (
-    <div className="px-3 pb-4 pt-1">
+    <div className="px-3 pb-4 pt-1 relative">
       {/* Error message */}
       {errorMessage && (
         <div
@@ -116,18 +118,32 @@ export function InputArea({
             onClick={onMicToggle}
             disabled={disabled}
             className={`relative flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center transition-all ${
-              isListening
-                ? 'bg-gradient-to-br from-red-500 to-game-rose text-white shadow-lg shadow-red-500/30 scale-110'
-                : 'bg-gradient-to-br from-game-grape to-game-pink text-white shadow-grape hover:scale-110 active:scale-95'
+              isMicWarming
+                ? 'bg-gradient-to-br from-game-sun to-game-orange text-white shadow-lg shadow-game-sun/30 animate-pulse'
+                : isListening
+                  ? 'bg-gradient-to-br from-red-500 to-game-rose text-white shadow-lg shadow-red-500/30 scale-110'
+                  : 'bg-gradient-to-br from-game-grape to-game-pink text-white shadow-grape hover:scale-110 active:scale-95'
             } disabled:opacity-40 disabled:scale-100`}
             style={{ minWidth: 56, minHeight: 56 }}
-            aria-label={isListening ? 'Dừng nghe' : 'Nói'}
+            aria-label={isMicWarming ? 'Đang chuẩn bị...' : isListening ? 'Dừng nghe' : 'Nói'}
           >
             {isListening && (
               <span className="absolute inset-0 rounded-full bg-red-500/50 animate-pulse-ring" />
             )}
-            <span className="relative text-2xl">{isListening ? '⏹' : '🎤'}</span>
+            {isMicWarming && (
+              <span className="absolute inset-0 rounded-full bg-game-sun/50 animate-pulse-ring" />
+            )}
+            <span className="relative text-2xl">
+              {isMicWarming ? '⏳' : isListening ? '⏹' : '🎤'}
+            </span>
           </button>
+        )}
+
+        {/* Mic warming indicator */}
+        {isMicWarming && (
+          <div className="absolute left-1/2 -translate-x-1/2 -top-8 bg-game-sun text-white text-xs font-bold px-3 py-1 rounded-full animate-bounce-in whitespace-nowrap z-10">
+            🎤 Sẵn sàng... Nói đi!
+          </div>
         )}
 
         {/* Text input — large and rounded */}

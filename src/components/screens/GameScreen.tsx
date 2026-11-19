@@ -428,36 +428,49 @@ export function GameScreen({ onFinish, onHome }: GameScreenProps) {
   )
 
   // ── STT mic toggle ──
+  const [isMicWarming, setIsMicWarming] = useState(false)
+
   const handleMicToggle = useCallback(() => {
     if (!sttRef.current) return
 
-    if (isListening) {
+    if (isListening || isMicWarming) {
       sttRef.current.stop()
       setIsListening(false)
+      setIsMicWarming(false)
       return
     }
 
     // Cancel any TTS first
     getTTSService().cancel()
-
     setInterimTranscript('')
-    sttRef.current.start({
-      onResult: (transcript, isFinal) => {
-        setInterimTranscript(transcript)
-        if (isFinal) {
+
+    // Warm-up phase: show "preparing..." and play a beep,
+    // then start recognition after 600ms so the mic is ready
+    setIsMicWarming(true)
+    if (settings.soundEnabled) getSoundService().playTurn()
+
+    setTimeout(() => {
+      if (!sttRef.current) return
+      setIsMicWarming(false)
+
+      sttRef.current.start({
+        onResult: (transcript, isFinal) => {
+          setInterimTranscript(transcript)
+          if (isFinal) {
+            setIsListening(false)
+          }
+        },
+        onError: (error) => {
+          setErrorAndSpeak(error)
           setIsListening(false)
-        }
-      },
-      onError: (error) => {
-        setErrorAndSpeak(error)
-        setIsListening(false)
-      },
-      onEnd: () => {
-        setIsListening(false)
-      },
-    })
-    setIsListening(true)
-  }, [isListening])
+        },
+        onEnd: () => {
+          setIsListening(false)
+        },
+      })
+      setIsListening(true)
+    }, 600)
+  }, [isListening, isMicWarming, settings.soundEnabled])
 
   return (
     <div className="flex flex-col h-screen max-h-screen bg-gradient-kids">
@@ -527,6 +540,7 @@ export function GameScreen({ onFinish, onHome }: GameScreenProps) {
             sttSupported={sttSupported.current}
             onMicToggle={handleMicToggle}
             isListening={isListening}
+            isMicWarming={isMicWarming}
             interimTranscript={interimTranscript}
           />
           <HintButton
