@@ -3,15 +3,10 @@
  *
  * Uses the Web Speech API (SpeechRecognition / webkitSpeechRecognition).
  *
- * Configuration:
- * - lang: "vi-VN"
- * - continuous: false (stop after one phrase)
- * - interimResults: true (show partial results while speaking)
- *
- * Browser support:
- * - Chrome / Edge: webkitSpeechRecognition (good Vietnamese support)
- * - Safari: SpeechRecognition (decent)
- * - Firefox: NOT SUPPORTED — the UI should show a text-input fallback
+ * Safari iOS quirks handled:
+ * - isFinal may not fire reliably → we auto-submit on final OR on silence timeout
+ * - onend may fire before final result → we track final result separately
+ * - continuous:false may not stop cleanly → we force stop + callback
  */
 
 import type { ISpeechRecognition, SpeechRecognitionEvent, SpeechRecognitionErrorEvent } from '../types/speech';
@@ -28,13 +23,15 @@ export interface STTCallbacks {
 export class STTService {
   private recognition: ISpeechRecognition | null = null;
   private isListening: boolean = false;
+  private silenceTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastTranscript: string = '';
+  private gotFinalResult: boolean = false;
 
   constructor() {
     const SpeechRecognitionCtor =
       window.SpeechRecognition ?? window.webkitSpeechRecognition;
 
     if (!SpeechRecognitionCtor) {
-      // Browser does not support speech recognition
       return;
     }
 
@@ -70,19 +67,52 @@ export class STTService {
       this.stop();
     }
 
+    this.lastTranscript = '';
+    this.gotFinalResult = false;
+    this.clearSilenceTimer();
+
     this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-      // Get the latest result
       const resultIndex = event.resultIndex;
       const result = event.results[resultIndex];
 
       if (result) {
         const transcript = result[0].transcript.trim();
         const isFinal = result.isFinal;
+
+        this.lastTranscript = transcript;
         callbacks.onResult(transcript, isFinal);
+
+        if (isFinal) {
+          // Got a final result — mark it and stop
+          this.gotFinalResult = true;
+          this.clearSilenceTimer();
+          // Force stop after a short delay to let Safari settle
+          setTimeout(() => {
+            if (this.isListening) {
+              this.isListening = false;
+              try { this.recognition?.stop(); } catch {}
+              callbacks.onEnd();
+            }
+          }, 100);
+        } else {
+          // Got interim result — reset silence timer
+          // If no final result comes within 2.5s of last interim, treat as final
+          this.resetSilenceTimer(() => {
+            if (this.isListening && this.lastTranscript && !this.gotFinalResult) {
+              // Silence timeout — treat last interim as final
+              callbacks.onResult(this.lastTranscript, true);
+              this.gotFinalResult = true;
+              this.isListening = false;
+              try { this.recognition?.stop(); } catch {}
+              callbacks.onEnd();
+            }
+          });
+        }
       }
     };
 
     this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      this.clearSilenceTimer();
       const errorMessages: Record<string, string> = {
         'no-speech': 'Không nghe thấy giọng nói. Thử lại nhé!',
         'audio-capture': 'Không thể truy cập micro. Kiểm tra quyền truy cập.',
@@ -97,6 +127,17 @@ export class STTService {
     };
 
     this.recognition.onend = () => {
+      this.clearSilenceTimer();
+      // If we already got a final result + called onEnd, skip
+      if (!this.isListening) return;
+
+      // Safari sometimes fires onend without a final result
+      // If we have a transcript, treat it as final
+      if (this.lastTranscript && !this.gotFinalResult) {
+        callbacks.onResult(this.lastTranscript, true);
+        this.gotFinalResult = true;
+      }
+
       this.isListening = false;
       callbacks.onEnd();
     };
@@ -111,6 +152,7 @@ export class STTService {
 
   /** Stop listening. */
   stop(): void {
+    this.clearSilenceTimer();
     if (this.recognition && this.isListening) {
       try {
         this.recognition.stop();
@@ -123,6 +165,7 @@ export class STTService {
 
   /** Abort listening immediately (discards any pending results). */
   abort(): void {
+    this.clearSilenceTimer();
     if (this.recognition && this.isListening) {
       try {
         this.recognition.abort();
@@ -141,6 +184,21 @@ export class STTService {
       this.recognition.onerror = null;
       this.recognition.onend = null;
       this.recognition.onstart = null;
+    }
+  }
+
+  // ── Silence timer ──
+
+  private resetSilenceTimer(onSilence: () => void): void {
+    this.clearSilenceTimer();
+    // 2.5 seconds of no new results → treat as done
+    this.silenceTimer = setTimeout(onSilence, 2500);
+  }
+
+  private clearSilenceTimer(): void {
+    if (this.silenceTimer) {
+      clearTimeout(this.silenceTimer);
+      this.silenceTimer = null;
     }
   }
 }
