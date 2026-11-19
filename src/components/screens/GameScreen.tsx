@@ -16,7 +16,7 @@ import { validateWord, calculateScore, getRandomStarter, getRequiredSyllable } f
 import { getLastSyllable, normalizeVietnamese } from '../../lib/vietnamese'
 import { DICTIONARY_INDEX, WORD_SET } from '../../data/dictionary-index'
 import { STARTER_WORDS } from '../../data/common-words'
-import type { GameState, PlayedWord, Player } from '../../types/game'
+import type { GameState, PlayedWord } from '../../types/game'
 
 interface GameScreenProps {
   onFinish: (humanScore: number, botScore: number, chainLength: number) => void
