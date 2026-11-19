@@ -13,10 +13,10 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
 
   if (!isOpen) return null
 
-  const difficulties: { key: Difficulty; label: string; desc: string; time: number }[] = [
-    { key: 'easy', label: '🐰 Dễ', desc: '30 giây mỗi lượt', time: 30 },
-    { key: 'medium', label: '🦊 Vừa', desc: '20 giây mỗi lượt', time: 20 },
-    { key: 'hard', label: '🐉 Khó', desc: '15 giây mỗi lượt', time: 15 },
+  const difficulties: { key: Difficulty; label: string; desc: string }[] = [
+    { key: 'easy', label: '🐰 Dễ', desc: 'Bot chọn từ đơn giản' },
+    { key: 'medium', label: '🦊 Vừa', desc: 'Bot chơi bình thường' },
+    { key: 'hard', label: '🐉 Khó', desc: 'Bot chọn từ hiểm hóc' },
   ]
 
   const timeOptions = [15, 20, 30, 60, 120, 180]
@@ -85,49 +85,32 @@ VITE_GEMINI_MODEL=gemini-3.8-flash-high`}
             )}
           </section>
 
-          {/* ── Difficulty ── */}
+          {/* ── Chế độ chơi (Difficulty + Time) ── */}
           <section>
             <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-              🎯 Độ khó
+              🎯 Chế độ chơi
             </h3>
-            <div className="space-y-2">
+
+            {/* Difficulty */}
+            <div className="flex gap-2 mb-4">
               {difficulties.map((d) => (
-                <label
+                <button
                   key={d.key}
-                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
+                  onClick={() => updateSettings({ difficulty: d.key })}
+                  className={`flex-1 p-2.5 rounded-xl text-center transition-all ${
                     settings.difficulty === d.key
                       ? 'bg-game-ocean/10 dark:bg-game-ocean/20 ring-2 ring-game-ocean/30'
                       : 'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
-                  <input
-                    type="radio"
-                    name="difficulty"
-                    checked={settings.difficulty === d.key}
-                    onChange={() =>
-                      updateSettings({ difficulty: d.key, turnTimeLimit: d.time })
-                    }
-                    className="sr-only"
-                  />
-                  <span className="text-lg">{d.label}</span>
-                  <div className="flex-1">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {d.desc}
-                    </span>
-                  </div>
-                  {settings.difficulty === d.key && (
-                    <span className="text-game-ocean font-bold">✓</span>
-                  )}
-                </label>
+                  <div className="text-lg">{d.label.split(' ')[0]}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{d.desc}</div>
+                </button>
               ))}
             </div>
-          </section>
 
-          {/* ── Time per turn ── */}
-          <section>
-            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-              ⏱️ Thời gian mỗi lượt
-            </h3>
+            {/* Time per turn */}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">⏱️ Thời gian mỗi lượt</p>
             <div className="flex flex-wrap gap-2">
               {timeOptions.map((t) => (
                 <button
