@@ -1,0 +1,759 @@
+<title>Nối Từ Game Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap">
+
+<style>
+  /* Layout: single-column document with phase cards and feature blocks */
+  :root {
+    --bg: #FAFAF7;
+    --fg: #1A1A2E;
+    --surface: #FFFFFF;
+    --surface-alt: #F0EDE6;
+    --accent: #E85D3A;
+    --accent-soft: #FFF0EC;
+    --accent2: #2D7DD2;
+    --accent2-soft: #EBF3FC;
+    --success: #2A9D5C;
+    --success-soft: #E8F7EF;
+    --muted: #8B8B9E;
+    --border: #E5E2DA;
+    --heading: 'Quicksand', 'Segoe UI', sans-serif;
+    --body: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F0F1A;
+      --fg: #E8E6E0;
+      --surface: #1A1A2E;
+      --surface-alt: #24243A;
+      --accent: #FF7B5C;
+      --accent-soft: #2A1A15;
+      --accent2: #5BA4E6;
+      --accent2-soft: #15223A;
+      --success: #3DC472;
+      --success-soft: #152A1D;
+      --muted: #7A7A90;
+      --border: #2E2E44;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F0F1A;
+    --fg: #E8E6E0;
+    --surface: #1A1A2E;
+    --surface-alt: #24243A;
+    --accent: #FF7B5C;
+    --accent-soft: #2A1A15;
+    --accent2: #5BA4E6;
+    --accent2-soft: #15223A;
+    --success: #3DC472;
+    --success-soft: #152A1D;
+    --muted: #7A7A90;
+    --border: #2E2E44;
+    color-scheme: dark;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--body);
+    line-height: 1.65;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 0;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+    padding-block: 2rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 2.5rem 1rem 2rem;
+  }
+  .hero-icon {
+    font-size: 3.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  .hero h1 {
+    font-family: var(--heading);
+    font-weight: 800;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    text-wrap: balance;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 .vi {
+    color: var(--accent);
+  }
+  .hero .subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Section header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  .section-header .num {
+    font-family: var(--heading);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .section-header h2 {
+    font-family: var(--heading);
+    font-weight: 700;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    text-wrap: balance;
+  }
+
+  /* Cards */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .card-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  .card h3 {
+    font-family: var(--heading);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .card p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* Tech badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .badge.api { background: var(--accent2-soft); color: var(--accent2); }
+  .badge.lib { background: var(--success-soft); color: var(--success); }
+  .badge.tool { background: var(--accent-soft); color: var(--accent); }
+
+  /* Phase timeline */
+  .phases {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .phase {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 0 1rem;
+    min-height: 0;
+  }
+  .phase-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .phase-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--accent-soft);
+    flex-shrink: 0;
+    margin-top: 0.3rem;
+  }
+  .phase-dot.p2 { background: var(--accent2); border-color: var(--accent2-soft); }
+  .phase-dot.p3 { background: var(--success); border-color: var(--success-soft); }
+  .phase-stem {
+    width: 2px;
+    flex: 1;
+    background: var(--border);
+    min-height: 1rem;
+  }
+  .phase-content {
+    padding-bottom: 1.5rem;
+  }
+  .phase:last-child .phase-stem { display: none; }
+  .phase:last-child .phase-content { padding-bottom: 0; }
+  .phase-title {
+    font-family: var(--heading);
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.15rem;
+  }
+  .phase-duration {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .phase-tasks {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .phase-tasks li {
+    font-size: 0.9rem;
+    padding-left: 1.25rem;
+    position: relative;
+    line-height: 1.5;
+  }
+  .phase-tasks li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  /* Architecture diagram */
+  .arch {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    overflow-x: auto;
+  }
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .arch-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 0;
+  }
+  .arch-box.user { background: var(--accent-soft); }
+  .arch-box.fe { background: var(--accent2-soft); }
+  .arch-box.be { background: var(--success-soft); }
+  .arch-box span:first-child { font-size: 1.3rem; }
+  .arch-box span:last-child {
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .arch-arrow {
+    color: var(--muted);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  /* Info box */
+  .info-box {
+    background: var(--surface-alt);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .info-box strong {
+    display: block;
+    font-family: var(--heading);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Tags row */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Table */
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .comparison-table th, .comparison-table td {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .comparison-table th {
+    font-family: var(--heading);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    background: var(--surface-alt);
+  }
+  .comparison-table th:first-child { border-radius: 8px 0 0 0; }
+  .comparison-table th:last-child { border-radius: 0 8px 0 0; }
+  .comparison-table td { color: var(--fg); }
+  .comparison-table tr:last-child td { border-bottom: none; }
+
+  @media (max-width: 500px) {
+    .arch-flow { flex-direction: column; }
+    .arch-arrow { transform: rotate(90deg); }
+    .phase { grid-template-columns: 2rem 1fr; gap: 0 0.75rem; }
+  }
+</style>
+
+<div class="container">
+  <!-- Hero -->
+  <div class="hero">
+    <span class="hero-icon">🔗</span>
+    <h1>Game <span class="vi">Nối Từ</span> Tiếng Việt</h1>
+    <p class="subtitle">Trò chơi nối từ có voice — dành cho trẻ em và người mới học chữ, chơi trên web</p>
+  </div>
+
+  <!-- Tổng quan -->
+  <section>
+    <div class="section-header">
+      <span class="num">Tổng quan</span>
+      <h2>Luật chơi & Ý tưởng</h2>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">📖</span>
+        <h3>Luật nối từ</h3>
+        <p>Người chơi nối từ tiếng Việt: từ tiếp theo phải bắt đầu bằng âm tiết cuối của từ trước. Ví dụ: <em>bàn học → học sinh → sinh viên</em>.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔊</span>
+        <h3>Đọc chữ cho người chơi</h3>
+        <p>Mọi từ được phát âm bằng Text-to-Speech (TTS). Trẻ em hoặc người chưa biết chữ chỉ cần nghe để hiểu từ, không cần đọc.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🎙️</span>
+        <h3>Nhập từ bằng giọng nói</h3>
+        <p>Người chơi nói từ vào micro, hệ thống nhận diện và chuyển thành chữ. Kết hợp cả gõ bàn phím cho ai quen.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🧒</span>
+        <h3>Thân thiện trẻ em</h3>
+        <p>Giao diện nhiều hình ảnh, ít chữ, nút to, màu sắc vui tươi. Có hướng dẫn bằng giọng nói từ đầu đến cuối.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kiến trúc -->
+  <section>
+    <div class="section-header">
+      <span class="num">Kiến trúc</span>
+      <h2>Luồng hoạt động</h2>
+    </div>
+    <div class="arch">
+      <div class="arch-flow">
+        <div class="arch-box user">
+          <span>🧑</span>
+          <span>Người chơi</span>
+        </div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-box user">
+          <span>🎙️</span>
+          <span>Voice Input (STT)</span>
+        </div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-box fe">
+          <span>⚛️</span>
+          <span>Frontend (React)</span>
+        </div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-box be">
+          <span>🗄️</span>
+          <span>Backend API</span>
+        </div>
+        <span class="arch-arrow">→</span>
+        <div class="arch-box be">
+          <span>📚</span>
+          <span>Từ điển DB</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:1rem">
+      <div class="arch">
+        <div class="arch-flow">
+          <div class="arch-box be">
+            <span>🗄️</span>
+            <span>Backend</span>
+          </div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-box fe">
+            <span>✅</span>
+            <span>Kiểm tra từ</span>
+          </div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-box fe">
+            <span>📝</span>
+            <span>Hiển thị kết quả</span>
+          </div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-box user">
+            <span>🔊</span>
+            <span>TTS đọc từ</span>
+          </div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-box user">
+            <span>🧑</span>
+            <span>Người chơi nghe</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Công nghệ -->
+  <section>
+    <div class="section-header">
+      <span class="num">Công nghệ</span>
+      <h2>Stack đề xuất</h2>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Thành phần</th>
+            <th>Lựa chọn</th>
+            <th>Lý do</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Frontend</strong></td>
+            <td>React + Vite + TypeScript</td>
+            <td>Nhanh, component hóa tốt, hệ sinh thái lớn</td>
+          </tr>
+          <tr>
+            <td><strong>Styling</strong></td>
+            <td>Tailwind CSS</td>
+            <td>Responsive dễ, thiết kế nhanh, theme dễ tùy chỉnh</td>
+          </tr>
+          <tr>
+            <td><strong>Voice Input</strong></td>
+            <td>Web Speech API (SpeechRecognition)</td>
+            <td>Miễn phí, chạy trực tiếp trên trình duyệt, hỗ trợ tiếng Việt</td>
+          </tr>
+          <tr>
+            <td><strong>Voice Output</strong></td>
+            <td>Web Speech API (SpeechSynthesis)</td>
+            <td>Có sẵn trên trình duyệt, hỗ trợ tiếng Việt. Fallback: Google TTS API</td>
+          </tr>
+          <tr>
+            <td><strong>Backend</strong></td>
+            <td>Node.js + Express hoặc Next.js API Routes</td>
+            <td>Fullstack JS, dễ deploy, real-time với WebSocket</td>
+          </tr>
+          <tr>
+            <td><strong>Database</strong></td>
+            <td>PostgreSQL + Redis</td>
+            <td>PostgreSQL cho từ điển, Redis cho session/leaderboard</td>
+          </tr>
+          <tr>
+            <td><strong>Real-time</strong></td>
+            <td>Socket.IO</td>
+            <td>Chơi đối kháng real-time giữa 2+ người</td>
+          </tr>
+          <tr>
+            <td><strong>Deploy</strong></td>
+            <td>Vercel (FE) + Railway/Render (BE)</td>
+            <td>Miễn phí tier, CI/CD tự động, dễ scale</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Voice chi tiết -->
+  <section>
+    <div class="section-header">
+      <span class="num">Voice</span>
+      <h2>Chi tiết tính năng giọng nói</h2>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🎤</span>
+        <h3>Speech-to-Text (Nhập bằng giọng)</h3>
+        <p>Dùng <code>webkitSpeechRecognition</code> với <code>lang: "vi-VN"</code>. Người chơi nhấn nút micro hoặc nói liên tục. Hiển thị kết quả tạm thời (interim) để người chơi thấy hệ thống đang nghe.</p>
+        <div class="tags">
+          <span class="badge api">Web Speech API</span>
+          <span class="badge tool">Miễn phí</span>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🔈</span>
+        <h3>Text-to-Speech (Đọc từ)</h3>
+        <p>Dùng <code>SpeechSynthesis</code> với voice tiếng Việt. Tự động đọc: từ vừa nối, từ gợi ý, hướng dẫn chơi. Có nút đọc lại từng từ trong chuỗi nối.</p>
+        <div class="tags">
+          <span class="badge api">SpeechSynthesis</span>
+          <span class="badge lib">Google TTS fallback</span>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🛡️</span>
+        <h3>Xử lý lỗi nhận diện</h3>
+        <p>Tiếng Việt có dấu → cần normalize. Nếu STT sai, gợi ý "Bạn muốn nói: ..." với các từ gần giống. Cho phép thử lại hoặc gõ tay.</p>
+        <div class="tags">
+          <span class="badge tool">Fuzzy matching</span>
+        </div>
+      </div>
+      <div class="card">
+        <span class="card-icon">📱</span>
+        <h3>Hỗ trợ trình duyệt</h3>
+        <p>Web Speech API hỗ trợ tốt nhất trên Chrome (desktop + mobile). Safari hỗ trợ một phần. Firefox cần fallback. Hiển thị cảnh báo nếu không hỗ trợ.</p>
+        <div class="tags">
+          <span class="badge lib">Chrome tốt nhất</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chế độ chơi -->
+  <section>
+    <div class="section-header">
+      <span class="num">Chế độ</span>
+      <h2>Các chế độ chơi</h2>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-icon">🤖</span>
+        <h3>Chơi với máy (AI)</h3>
+        <p>Bot tự động nối từ, có nhiều mức độ khó. Dễ: bot chờ lâu, gợi ý nhiều. Khó: bot nối nhanh, dùng từ hiếm. Phù hợp cho trẻ em luyện tập.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">👥</span>
+        <h3>Chơi đối kháng (PvP)</h3>
+        <p>2 người chơi real-time qua Socket.IO. Tạo phòng bằng mã code hoặc link. Mỗi người có thời gian giới hạn để nối từ.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">🏠</span>
+        <h3>Chơi nhóm (Party)</h3>
+        <p>3-8 người trong phòng, lần lượt nối từ. Ai hết thời gian hoặc nối sai thì bị loại. Người cuối cùng thắng.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">📝</span>
+        <h3>Luyện tập (Practice)</h3>
+        <p>Không giới hạn thời gian, có gợi ý từ, hiển thị nghĩa của từ. Hệ thống đọc to từng từ giúp trẻ học từ mới. Theo dõi tiến trình học.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tính năng chính -->
+  <section>
+    <div class="section-header">
+      <span class="num">Tính năng</span>
+      <h2>Các tính năng chính</h2>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <h3>📚 Từ điển tiếng Việt</h3>
+        <p>Khoảng 30.000-50.000 từ ghép tiếng Việt phổ biến. Phân loại theo chủ đề (động vật, trường học, gia đình...). Mỗi từ có: phiên âm, nghĩa, ví dụ, hình minh họa.</p>
+      </div>
+      <div class="card">
+        <h3>🏆 Bảng xếp hạng</h3>
+        <p>Điểm theo: số từ nối được, tốc độ, độ khó của từ. Leaderboard theo ngày/tuần/tháng. Huy hiệu thành tích (nối 10 từ liên tiếp, dùng từ hiếm...).</p>
+      </div>
+      <div class="card">
+        <h3>🎨 Giao diện trẻ em</h3>
+        <p>Nút to, bo tròn, màu sắc tươi sáng. Hiệu ứng vui khi nối đúng (confetti, sao bay). Animation mượt cho từng bước chơi. Mascot hướng dẫn bằng giọng nói.</p>
+      </div>
+      <div class="card">
+        <h3>🔔 Thông báo âm thanh</h3>
+        <p>Âm thanh vui khi nối đúng, âm cảnh báo nhẹ khi sắp hết giờ. Nhạc nền nhẹ nhàng (tắt/bật được). Mọi thao tác có phản hồi bằng âm thanh.</p>
+      </div>
+      <div class="card">
+        <h3>💡 Hệ thống gợi ý</h3>
+        <p>Gợi ý bằng hình ảnh minh họa (trẻ chưa đọc được chữ). Gợi ý bằng giọng nói: "Thử nghĩ về con vật bắt đầu bằng...". Giới hạn số lần gợi ý mỗi lượt.</p>
+      </div>
+      <div class="card">
+        <h3>👨‍👩‍👧 Chế độ phụ huynh</h3>
+        <p>Theo dõi tiến trình học từ của trẻ. Giới hạn thời gian chơi mỗi ngày. Chọn chủ đề/độ khó phù hợp lứa tuổi. Báo cáo từ mới trẻ đã học.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cấu trúc dữ liệu -->
+  <section>
+    <div class="section-header">
+      <span class="num">Dữ liệu</span>
+      <h2>Cấu trúc dữ liệu chính</h2>
+    </div>
+    <div class="info-box" style="font-family: 'Courier New', monospace; font-size: 0.82rem; white-space: pre-wrap; overflow-x: auto;">
+<strong style="font-family: var(--heading); font-size: 0.95rem;">Từ điển (words)</strong>
+{
+  id, word, syllables[],      // "học sinh" → ["học", "sinh"]
+  lastSyllable,               // "sinh" — dùng để nối
+  firstSyllable,              // "học" — dùng để kiểm tra
+  category,                   // "giáo dục"
+  difficulty,                 // 1-5
+  meaning, example,
+  imageUrl, audioUrl
+}
+
+<strong style="font-family: var(--heading); font-size: 0.95rem;">Phòng chơi (rooms)</strong>
+{
+  id, code,                   // "ABC123"
+  mode,                       // "pvp" | "party" | "practice"
+  players[],                  // [{id, name, score, isReady}]
+  wordChain[],                // ["bàn học", "học sinh", "sinh viên"]
+  currentTurn,                // player index
+  timePerTurn,                // giây
+  status                      // "waiting" | "playing" | "finished"
+}
+
+<strong style="font-family: var(--heading); font-size: 0.95rem;">Người chơi (users)</strong>
+{
+  id, displayName, avatar,
+  stats: { gamesPlayed, wins, longestChain, wordsLearned },
+  achievements[],
+  parentalControls: { dailyLimit, allowedCategories }
+}</div>
+  </section>
+
+  <!-- Lộ trình -->
+  <section>
+    <div class="section-header">
+      <span class="num">Lộ trình</span>
+      <h2>Kế hoạch phát triển</h2>
+    </div>
+    <div class="phases">
+      <!-- Phase 1 -->
+      <div class="phase">
+        <div class="phase-line">
+          <div class="phase-dot"></div>
+          <div class="phase-stem"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-title">Phase 1 — Nền tảng</div>
+          <div class="phase-duration">2-3 tuần</div>
+          <ul class="phase-tasks">
+            <li>Khởi tạo project: React + Vite + TypeScript + Tailwind</li>
+            <li>Xây dựng từ điển tiếng Việt (crawl + validate 30K từ ghép)</li>
+            <li>Logic nối từ cơ bản: kiểm tra âm tiết cuối → đầu</li>
+            <li>Tích hợp Web Speech API: TTS đọc từ tiếng Việt</li>
+            <li>Chế độ chơi với máy (AI bot đơn giản)</li>
+            <li>UI cơ bản: nhập từ, hiển thị chuỗi, kết quả</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="phase">
+        <div class="phase-line">
+          <div class="phase-dot p2"></div>
+          <div class="phase-stem"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-title">Phase 2 — Voice & UX</div>
+          <div class="phase-duration">2-3 tuần</div>
+          <ul class="phase-tasks">
+            <li>Tích hợp Speech-to-Text: nhập từ bằng giọng nói</li>
+            <li>Xử lý dấu tiếng Việt trong nhận diện giọng nói</li>
+            <li>Giao diện thân thiện trẻ em: nút to, hình ảnh, animation</li>
+            <li>Hiệu ứng âm thanh: đúng/sai, hết giờ, thắng/thua</li>
+            <li>Hệ thống gợi ý bằng hình ảnh + giọng nói</li>
+            <li>Responsive: tối ưu cho điện thoại + tablet</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="phase">
+        <div class="phase-line">
+          <div class="phase-dot p3"></div>
+          <div class="phase-stem"></div>
+        </div>
+        <div class="phase-content">
+          <div class="phase-title">Phase 3 — Multiplayer & Polish</div>
+          <div class="phase-duration">3-4 tuần</div>
+          <ul class="phase-tasks">
+            <li>Backend API: Express/Next.js + PostgreSQL + Redis</li>
+            <li>WebSocket (Socket.IO): chơi PvP & Party real-time</li>
+            <li>Hệ thống phòng: tạo/tham gia bằng mã hoặc link</li>
+            <li>Bảng xếp hạng + huy hiệu thành tích</li>
+            <li>Chế độ phụ huynh: giới hạn thời gian, báo cáo học tập</li>
+            <li>PWA: cài đặt lên màn hình, chơi offline (vs AI)</li>
+            <li>Testing, tối ưu hiệu suất, deploy production</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Thách thức -->
+  <section>
+    <div class="section-header">
+      <span class="num">Lưu ý</span>
+      <h2>Thách thức kỹ thuật</h2>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🇻🇳 Tiếng Việt & Dấu</h3>
+        <p>STT có thể trả về sai dấu (sán/sàn/sản). Cần normalize Unicode (NFC), fuzzy matching với Levenshtein distance, và bảng mapping các lỗi phổ biến của STT tiếng Việt.</p>
+      </div>
+      <div class="card">
+        <h3>🔤 Xác định "từ" tiếng Việt</h3>
+        <p>Tiếng Việt không có khoảng trắng phân tách từ ghép rõ ràng. "học sinh" là 1 từ hay 2 từ? Cần từ điển chuẩn và thuật toán tokenize tiếng Việt.</p>
+      </div>
+      <div class="card">
+        <h3>🌐 Hỗ trợ trình duyệt</h3>
+        <p>Web Speech API không đồng nhất trên các trình duyệt. Cần feature detection, fallback UI (gõ bàn phím), và thông báo rõ ràng khi không hỗ trợ.</p>
+      </div>
+      <div class="card">
+        <h3>⚡ Latency real-time</h3>
+        <p>Chơi PvP cần độ trễ thấp. WebSocket + server ở region gần (Singapore/HCM). Optimistic UI update để người chơi không cảm thấy lag.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bước tiếp theo -->
+  <section>
+    <div class="info-box">
+      <strong>🚀 Bắt đầu ngay?</strong>
+      Nếu bạn đã sẵn sàng, tôi có thể bắt đầu với Phase 1: khởi tạo project React + Vite, xây dựng logic nối từ cơ bản, và tích hợp TTS đọc từ tiếng Việt. Chúng ta sẽ có một bản chơi được trong 1-2 tuần đầu tiên.
+    </div>
+  </section>
+</div>
